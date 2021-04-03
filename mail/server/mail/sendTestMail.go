@@ -17,7 +17,7 @@ func (s *Server) SendTestMail(ctx context.Context, input *mail.SendTestMailInput
 	defer log.Tracef("End")
 
 	// Check inputs
-	if input.Email == "" || input.Message == "" {
+	if input.Email == "" {
 		return nil, constant.EmptyField
 	}
 
@@ -27,7 +27,7 @@ func (s *Server) SendTestMail(ctx context.Context, input *mail.SendTestMailInput
 	m := s.NewMessage()
 
 	//Setting headers
-	m.SetHeader("From", smtpMail)
+	m.SetHeader("From", smtpAccountEmail)
 	m.SetHeader("To", input.Email)
 	m.SetHeader("Subject", "Welcome")
 

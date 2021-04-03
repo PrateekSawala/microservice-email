@@ -10,11 +10,13 @@ import (
 )
 
 var (
-	service      = "mail"           // service name
-	serverPort   = "localhost:8080" // Server port
-	smtpMail     = ""               // SMTP account email
-	smptUser     = ""               // SMTP account user
-	smtpPASSWORD = ""               // SMTP account password
+	service             = "mail"           // service name
+	serverPort          = "localhost:8080" // Server port
+	smtpHostName        = ""               // SMTP host name
+	smtpPortNumber      = 0                // SMTP port number
+	smtpAccountEmail    = ""               // SMTP account email
+	smptUserName        = ""               // SMTP user name
+	smtpAccountPassword = ""               // SMTP account password
 )
 
 func main() {

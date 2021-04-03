@@ -96,7 +96,7 @@ func (Build) Build() error {
 	return nil
 }
 
-// Run the service
+// Running the service
 func (Build) Run() error {
 	mg.Deps(Build.Build)
 
@@ -111,7 +111,7 @@ func (Build) Run() error {
 	return nil
 }
 
-// Test the service
+// Testing the service
 func (Build) Test() error {
 	fmt.Printf("%s testing service %s...\n", color.Cyan("Microservice"), service)
 

@@ -13,7 +13,7 @@ func (s *Server) NewMessage() *mail.Message {
 // Client
 func Client() *mail.Dialer {
 	// Init Mail connection
-	d := mail.NewDialer("smtp.gmail.com", 465, "", "")
+	d := mail.NewDialer(smtpHostName, smtpPortNumber, smptUserName, smtpAccountPassword)
 	d.StartTLSPolicy = mail.MandatoryStartTLS
 	return d
 }
