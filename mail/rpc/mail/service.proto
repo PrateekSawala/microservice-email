@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package microsevice.mail;
+option go_package = "mail/rpc/mail";
+
+// Mail microservice
+service Mail {
+  // Transmits the entries
+  rpc SendTestMail(SendTestMailInput) returns (SendTestMailResult);
+}
+
+message SendTestMailInput {
+    string name = 1;  
+    string email = 2; 
+    string message = 3;
+    string phone = 4;
+    string title = 5;
+    string preview = 6;
+}
+
+message SendTestMailResult {
+}
