@@ -7,6 +7,9 @@ option go_package = "mail/rpc/mail";
 service Mail {
   // Transmits the entries
   rpc SendTestMail(SendTestMailInput) returns (SendTestMailResult);
+
+  // Send Custom Mail
+  rpc SendCustomMail(SendCustomMailInput) returns (SendCustomMailResult);
 }
 
 message SendTestMailInput {
@@ -19,4 +22,16 @@ message SendTestMailInput {
 }
 
 message SendTestMailResult {
+}
+
+message SendCustomMailInput {
+  string from = 1;
+  string to = 2;
+  string subject = 3;
+  string body = 4;
+  string title = 5;
+  string preview = 6;
+}
+
+message SendCustomMailResult {
 }

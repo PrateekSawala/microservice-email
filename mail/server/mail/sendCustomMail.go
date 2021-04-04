@@ -10,26 +10,25 @@ import (
 	"microsevice.email/mail/rpc/mail"
 )
 
-// SendTestMail ...
-func (s *Server) SendTestMail(ctx context.Context, input *mail.SendTestMailInput) (*mail.SendTestMailResult, error) {
-	log := log("SendTestMail")
+// SendCustomMail ...
+func (s *Server) SendCustomMail(ctx context.Context, input *mail.SendCustomMailInput) (*mail.SendCustomMailResult, error) {
+	log := log("SendCustomMail")
 	log.Tracef("Start")
 	defer log.Tracef("End")
 
 	// Check inputs
-	if input == nil || input.Email == "" {
+	if input == nil || input.From == "" || input.To == "" || input.Subject == "" || input.Body == "" {
+		log.Debugf("Empty Input")
 		return nil, constant.EmptyField
 	}
-
-	log.Tracef("Input: %+v", input)
 
 	// Creating a new message
 	m := s.NewMessage()
 
 	//Setting headers
-	m.SetHeader("From", smtpAccountEmail)
-	m.SetHeader("To", input.Email)
-	m.SetHeader("Subject", "Welcome")
+	m.SetHeader("From", input.From)
+	m.SetHeader("To", input.To)
+	m.SetHeader("Subject", input.Subject)
 
 	// init new input.Email content buffer
 	content := new(bytes.Buffer)
@@ -41,17 +40,13 @@ func (s *Server) SendTestMail(ctx context.Context, input *mail.SendTestMailInput
 
 	templateInt := template.Must(template.New("input.EmailTemplate").Parse(string(templateIntByte)))
 
-	// Selecting mail greeting
-	paramsBody := map[string]string{
-		"Name":    input.Name,
-		"Phone":   input.Phone,
-		"Message": input.Message,
-	}
+	paramsBody := map[string]string{}
 
 	//Set body content of the email template
-	body := template.Must(template.New("Template-Body").Parse(`<h3>Hey there,</h3><p>Name: {{.Name}}</p><p>Phone: {{.Phone}}</p><p>Message: {{.Message}}</p>`))
+	body := template.Must(template.New("Template-Body").Parse(input.Body))
 
 	bodyContent := new(bytes.Buffer)
+
 	// Set parameters which will be filled in template
 	body.Execute(bodyContent, &paramsBody)
 
@@ -60,17 +55,23 @@ func (s *Server) SendTestMail(ctx context.Context, input *mail.SendTestMailInput
 		"Preview": input.Preview,
 		"Title":   input.Title,
 	}
+
+	if input.Title == "" {
+		paramsTemplate["Title"] = input.Subject
+	}
+
 	// Parse template and substitute params
 	templateInt.Execute(content, &paramsTemplate)
 
 	//Setting the body of the message
-	m.SetBody("text/html", string(bodyContent.Bytes()))
+	m.SetBody("text/html", string(content.Bytes()))
 
+	//Calling the gatekeeper send mail method
 	err = s.sendMail(m)
 	if err != nil {
-		log.Debugf("Error while sending internal mail to service@: %s", err)
+		log.Debugf("Error while sending  mail %s : to email : %s", err, input.To)
 		return nil, err
 	}
 
-	return &mail.SendTestMailResult{}, nil
+	return &mail.SendCustomMailResult{}, nil
 }
