@@ -1,6 +1,9 @@
 package main
 
 import (
+	"os"
+	"strconv"
+
 	"github.com/go-mail/mail"
 )
 
@@ -12,8 +15,11 @@ func (s *Server) NewMessage() *mail.Message {
 
 // Client
 func Client() *mail.Dialer {
+	// FInd SMTP port
+	port, _ := strconv.Atoi(os.Getenv("SMTP_PORT"))
+
 	// Init Mail connection
-	d := mail.NewDialer(smtpHostName, smtpPortNumber, smptUserName, smtpAccountPassword)
+	d := mail.NewDialer(os.Getenv("SMTP_HOST"), port, os.Getenv("SMTP_USER"), os.Getenv("SMTP_PASSWORD"))
 	d.StartTLSPolicy = mail.MandatoryStartTLS
 	return d
 }

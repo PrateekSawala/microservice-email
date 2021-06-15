@@ -1,8 +1,9 @@
 package main
 
 import (
-	"fmt"
+	"flag"
 	"net/http"
+	"os"
 
 	"microsevice.email/mail/rpc/mail"
 
@@ -10,13 +11,9 @@ import (
 )
 
 var (
-	service             = "mail"           // service name
-	serverPort          = "localhost:8080" // Server port
-	smtpHostName        = ""               // SMTP host name
-	smtpPortNumber      = 0                // SMTP port number
-	smtpAccountEmail    = ""               // SMTP account email
-	smptUserName        = ""               // SMTP user name
-	smtpAccountPassword = ""               // SMTP account password
+	service           = flag.String("service", os.Getenv("SERVICE_NAME"), "Service name")
+	SmtpAccountEmail  = flag.String("SMTP account email", os.Getenv("SMTP_Account_Email"), "The email account of mail sender")
+	serverFQDNandPort = "localhost:3015"
 )
 
 func main() {
@@ -25,8 +22,6 @@ func main() {
 	logrus.SetLevel(logrus.TraceLevel)
 
 	log := log("main")
-
-	fmt.Println("main")
 
 	// Init Mail connection
 	goMailDialer := Client()
@@ -38,7 +33,12 @@ func main() {
 
 	handler := mail.NewMailServer(&server, nil)
 
-	log.Debugf("Microsevice.email %s server started: %v", service, serverPort)
+	// Check if port is provided in environment configuration
+	if os.Getenv("PORT") != "" {
+		serverFQDNandPort = os.Getenv("PORT")
+	}
 
-	log.Warnf("Server exited: %s", http.ListenAndServe(serverPort, handler))
+	log.Debugf("Microsevice %s server started: %v", *service, serverFQDNandPort)
+
+	log.Warnf("Server exited: %s", http.ListenAndServe(serverFQDNandPort, handler))
 }

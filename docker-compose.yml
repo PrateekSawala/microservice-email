@@ -1,0 +1,18 @@
+version: '2'
+
+services:
+
+    mail:
+        image: mail:mail
+        restart: always
+        container_name: mail
+        ports:
+          - 3015:80
+        environment:
+          - SERVICE_NAME=mail
+          - PORT=:80
+          - SMTP_Account_Email=email
+          - SMTP_HOST=hostname
+          - SMTP_PORT=post
+          - SMTP_USER=username
+          - SMTP_PASSWORD=password

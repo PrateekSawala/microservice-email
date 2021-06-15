@@ -27,7 +27,7 @@ func (s *Server) SendTestMail(ctx context.Context, input *mail.SendTestMailInput
 	m := s.NewMessage()
 
 	//Setting headers
-	m.SetHeader("From", smtpAccountEmail)
+	m.SetHeader("From", *SmtpAccountEmail)
 	m.SetHeader("To", input.Email)
 	m.SetHeader("Subject", "Welcome")
 

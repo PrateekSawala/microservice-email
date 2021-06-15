@@ -19,6 +19,7 @@ var (
 
 type Helper mg.Namespace
 type Build mg.Namespace
+type Docker mg.Namespace
 type Clean mg.Namespace
 
 // Remove the .temp folder
@@ -26,7 +27,7 @@ func (Clean) temp() error {
 
 	// parallelize execution
 	go func() {
-		tempFolder := fmt.Sprintf("./%s/.temp", service)
+		tempFolder := fmt.Sprintf("./%s/.temp/", service)
 
 		// clean any existing .temp folder
 		if _, err := os.Stat(tempFolder); !os.IsNotExist(err) {
@@ -76,21 +77,43 @@ func (Build) Build() error {
 
 	mg.Deps(Clean.temp)
 
-	servicePath := "./" + service + "/"
+	buildServicePath := "./" + service + "/"
 
-	err := sh.Run("env", "CGO_ENABLED=0", "GOOS=linux", "go", "build", "-o", servicePath+"/.temp/"+service, servicePath+"/server/"+service)
+	err := sh.Run("env", "CGO_ENABLED=0", "GOOS=linux", "go", "build", "-o", buildServicePath+"/.temp/"+service, buildServicePath+"/server/"+service)
 	if err != nil {
 		fmt.Printf(color.Red("Build:Build go build error: %s\n"), err)
 		return err
 	}
 
 	// if the service has a /templates folder, copy it to .temp image building source folder
-	if _, err := os.Stat(servicePath + "/templates"); !os.IsNotExist(err) {
-		err := sh.Run("cp", "-r", servicePath+"/templates", servicePath+"/.temp")
+	if _, err := os.Stat(buildServicePath + "/templates"); !os.IsNotExist(err) {
+		err := sh.Run("cp", "-r", buildServicePath+"/templates", buildServicePath+"/.temp")
 		if err != nil {
 			fmt.Printf(color.Red("Build:Build cp templates folder error: %s\n"), err)
 			return err
 		}
+	}
+
+	return nil
+}
+
+// Create a Docker image
+func (Docker) Image() error {
+
+	mg.Deps(Build.Build)
+
+	imageServicePath := "./" + service
+
+	// build image
+	err := sh.Run("docker", "build", "-t", "mail:mail", "-f", fmt.Sprintf("%s/Dockerfile", imageServicePath), fmt.Sprintf("%s/.temp/.", imageServicePath))
+	if err != nil {
+		fmt.Printf(color.Red("Build:Image docker build error: %s\n"), err)
+	}
+
+	// cleanup .temp folder
+	err = sh.Run("rm", "-rf", fmt.Sprintf("%s/.temp/", imageServicePath))
+	if err != nil {
+		fmt.Printf(color.Red("Build:Image .temp cleanup error: %s\n"), err)
 	}
 
 	return nil

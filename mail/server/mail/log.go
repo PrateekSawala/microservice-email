@@ -11,7 +11,7 @@ import (
 // log is a helper class that enrichens the structured logging
 func log(input interface{}) *logrus.Entry {
 	log := logrus.WithFields(logrus.Fields{
-		"service": service,
+		"service": *service,
 		"method":  "unkown",
 	})
 
