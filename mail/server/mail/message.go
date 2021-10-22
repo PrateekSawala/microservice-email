@@ -21,6 +21,7 @@ func Client() *mail.Dialer {
 	// Init Mail connection
 	d := mail.NewDialer(os.Getenv("SMTP_HOST"), port, os.Getenv("SMTP_USER"), os.Getenv("SMTP_PASSWORD"))
 	d.StartTLSPolicy = mail.MandatoryStartTLS
+	d.Timeout = 20
 	return d
 }
 

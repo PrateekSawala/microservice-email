@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -19,15 +20,14 @@ func main() {
 }
 
 func sendTestMail() {
-
 	// Declare mail content
 	mailContent := &mail.SendTestMailInput{
-		Name:    "",
-		Email:   "",
-		Message: "",
-		Phone:   "",
+		Name:    "test user",
+		Email:   "testuser@mail.com",
+		Message: "test message",
+		Phone:   "1234567890",
 	}
-
+	// SendTestMail
 	_, err := client.SendTestMail(context.Background(), mailContent)
 	if err != nil {
 		log.Println("Error", err)
@@ -37,12 +37,23 @@ func sendTestMail() {
 func sendCustomMail() {
 	// Declare mail content
 	mailContent := &mail.SendCustomMailInput{
-		From:    "",
-		To:      "",
-		Subject: "",
-		Body:    "",
+		From:    "testuser@mail.com",
+		To:      "testuser1@mail.com",
+		Subject: "test message",
 	}
-
+	// Prepare content body
+	mailContent.Body = fmt.Sprintf(`
+	<!DOCTYPE html>
+	<html>
+	    <head>
+			<title>Test message</title>
+		</head>
+	    <body>
+			<p>Hi there</p>
+		</body>
+	</html>
+	`)
+	// SendCustomMail
 	_, err := client.SendCustomMail(context.Background(), mailContent)
 	if err != nil {
 		log.Println("Error", err)
